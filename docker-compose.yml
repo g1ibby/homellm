@@ -1,0 +1,38 @@
+version: "3.9"
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm-database:main-latest
+    depends_on:
+      - postgres
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - ./scripts/:/scripts/
+    ports:
+      - "4000:4000"
+    restart: on-failure
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/postgres
+      DIRECT_URL: postgresql://postgres:password@postgres:5432/postgres
+      UI_USERNAME: ${UI_USERNAME}
+      UI_PASSWORD: ${UI_PASSWORD}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      TOGETHERAI_API_KEY: ${TOGETHERAI_API_KEY}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
+      ANYSCALE_API_KEY: ${ANYSCALE_API_KEY}
+      DEEPINFRA_API_KEY: ${DEEPINFRA_API_KEY}
+    entrypoint: ["/scripts/entrypoint.sh"]
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "3100:8080"
+    restart: on-failure
+    volumes:
+      - ./open-webui:/app/backend/data
