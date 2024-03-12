@@ -18,6 +18,14 @@ model_list:
     model: openai/gpt-4-turbo-preview
   model_name: gpt-4-turbo
 - litellm_params:
+    api_key: os.environ/OPENAI_API_KEY
+    model: openai/gpt-4-turbo-preview
+  model_name: gpt-4-1106-preview 
+- litellm_params:
+    api_key: os.environ/ANTHROPIC_API_KEY
+    model: anthropic/claude-3-opus-20240229
+  model_name: claude-3-opus
+- litellm_params:
     api_key: os.environ/TOGETHERAI_API_KEY
     model: together_ai/codellama/CodeLlama-70b-hf
   model_info:

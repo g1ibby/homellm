@@ -20,6 +20,7 @@ services:
       MISTRAL_API_KEY: ${MISTRAL_API_KEY}
       ANYSCALE_API_KEY: ${ANYSCALE_API_KEY}
       DEEPINFRA_API_KEY: ${DEEPINFRA_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
     entrypoint: ["/scripts/entrypoint.sh"]
 
   postgres:
