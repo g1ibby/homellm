@@ -37,3 +37,12 @@ services:
     restart: on-failure
     volumes:
       - ./open-webui:/app/backend/data
+      - ./config.yaml:/app/backend/data/litellm/config.yaml
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      TOGETHERAI_API_KEY: ${TOGETHERAI_API_KEY}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
+      ANYSCALE_API_KEY: ${ANYSCALE_API_KEY}
+      DEEPINFRA_API_KEY: ${DEEPINFRA_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+
