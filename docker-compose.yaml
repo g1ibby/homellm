@@ -1,0 +1,98 @@
+networks:
+  traefik-net:
+    name: traefik-net
+
+services:
+  traefik:
+    image: traefik:v2.11
+    container_name: homellm-traefik
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - traefik-net
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/config/traefik.yml:/etc/traefik/traefik.yml:ro
+    labels:
+      - "traefik.enable=true"
+
+  postgres:
+    image: postgres:17
+    container_name: homellm-postgres
+    restart: always
+    networks:
+      - traefik-net
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER?Variable POSTGRES_USER is not set}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD?Variable POSTGRES_PASSWORD is not set}
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d
+
+  litellm:
+    image: ghcr.io/berriai/litellm-database:main-latest
+    container_name: homellm-litellm
+    networks:
+      - traefik-net
+    depends_on:
+      - postgres
+    restart: on-failure
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER?Variable POSTGRES_USER is not set}:${POSTGRES_PASSWORD?Variable POSTGRES_PASSWORD is not set}@postgres:5432/litellm
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY?Variable LITELLM_MASTER_KEY is not set}
+      LITELLM_SALT_KEY: ${LITELLM_SALT_KEY?Variable LITELLM_SALT_KEY is not set}
+      UI_USERNAME: ${LITELLM_UI_USERNAME?Variable LITELLM_UI_USERNAME is not set}
+      UI_PASSWORD: ${LITELLM_UI_PASSWORD?Variable LITELLM_UI_PASSWORD is not set}
+      STORE_MODEL_IN_DB: "True"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.litellm.rule=Host(`${LITELLM_HOSTNAME?Variable LITELLM_HOSTNAME is not set}`)"
+      - "traefik.http.routers.litellm.entrypoints=websecure"
+      - "traefik.http.routers.litellm.tls=true"
+      # Service configuration - Hardcoded internal port
+      - "traefik.http.services.litellm.loadbalancer.server.port=4000"
+      - "traefik.http.services.litellm.loadbalancer.server.scheme=http"
+      # Middleware for headers
+      - "traefik.http.middlewares.litellm-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.litellm.middlewares=litellm-headers"
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: homell-webui
+    restart: always
+    depends_on:
+      - postgres
+    networks:
+      - traefik-net
+    volumes:
+      - ./open-webui:/app/backend/data
+    environment:
+      RAG_EMBEDDING_ENGINE: "ollama"
+      AUDIO_STT_ENGINE: "openai"
+      DATABASE_URL: postgresql://${POSTGRES_USER?Variable POSTGRES_USER is not set}:${POSTGRES_PASSWORD?Variable POSTGRES_PASSWORD is not set}@postgres:5432/openwebui
+    labels:
+      - "traefik.enable=true"
+      # Router configuration using variable from .env - Make mandatory
+      - "traefik.http.routers.open-webui.rule=Host(`${OPENWEBUI_HOSTNAME?Variable OPENWEBUI_HOSTNAME is not set}`)"
+      - "traefik.http.routers.open-webui.entrypoints=websecure"
+      - "traefik.http.routers.open-webui.tls=true"
+      # Service configuration - Hardcoded internal port
+      - "traefik.http.services.open-webui.loadbalancer.server.port=8080"
+      - "traefik.http.services.open-webui.loadbalancer.server.scheme=http"
+      # Middleware for headers
+      - "traefik.http.middlewares.open-webui-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.open-webui.middlewares=open-webui-headers"
+
+  open-webui-pipelines:
+    image: ghcr.io/open-webui/pipelines:main
+    container_name: homellm-pipelines
+    restart: always
+    networks:
+      - traefik-net
+    volumes:
+      - ./open-webui-pipelines:/app/pipelines
