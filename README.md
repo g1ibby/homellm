@@ -1,6 +1,6 @@
-# HomeLLM: Your Personal LLM Gateway and UI, Simplified
+# HomeLLM: Your Personal LLM Gateway and chat UI
 
-Welcome to HomeLLM! This project provides a straightforward boilerplate to deploy a powerful combination of Open WebUI and LiteLLM using Docker Compose. It's designed for personal use on your own server or VPS, giving you a private and controlled environment for interacting with various language models, fronted by a secure Traefik reverse proxy.
+This project provides a straightforward boilerplate to deploy a powerful combination of Open WebUI and LiteLLM using Docker Compose. It's designed for personal use on your own server or VPS, giving you a private and controlled environment for interacting with various language models, fronted by a secure Traefik reverse proxy.
 
 ## What's Inside?
 
@@ -24,10 +24,10 @@ This setup bundles essential tools for your personal LLM stack:
 
 Get the project files onto your server:
 
-'''bash
+```bash
 git clone https://github.com/g1ibby/homellm.git
 cd homellm
-'''
+```
 
 **2. Configure DNS (Cloudflare Recommended)**
 
@@ -39,9 +39,9 @@ cd homellm
 This is crucial for storing your secrets and deployment-specific settings.
 
 *   Copy the template file:
-    '''bash
-    cp .env.dist .env
-    '''
+```bash
+cp .env.dist .env
+```
 *   **Edit the `.env` file**.
 *   Carefully replace **ALL** placeholder values with your actual secrets and desired hostnames. Pay close attention to the comments in the `.env.dist` file for guidance, especially the required `sk-` prefix for `LITELLM_MASTER_KEY` and `LITELLM_SALT_KEY`.
 
@@ -49,9 +49,9 @@ This is crucial for storing your secrets and deployment-specific settings.
 
 Start all the services:
 
-'''bash
+```bash
 docker-compose up -d
-'''
+```
 
 Docker Compose will read the configuration, pull images, and start the containers. If the host directories specified in the `volumes` sections of `docker-compose.yml` (like `./postgres-data`, `./open-webui`) don't exist, Docker will typically create them automatically.
 
