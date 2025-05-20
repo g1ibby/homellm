@@ -1,0 +1,23 @@
+name: Deploy on Push
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Docker Compose Deployment
+        uses: g1ibby/dcd/dcd-deploy@main
+        with:
+          command: up
+          compose_files: docker-compose.yaml
+          env_files: .env
+          host: ${{ secrets.DEPLOY_HOST }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          user: ${{ secrets.DEPLOY_USER }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_dir: /opt/homellm
+          no_health_check: 'false'

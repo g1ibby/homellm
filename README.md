@@ -65,3 +65,17 @@ Docker Compose will read the configuration, pull images, and start the container
 You should be greeted by the respective interfaces, served over HTTPS.
 
 Enjoy your self-hosted LLM gateway and UI!
+
+## CI/CD with GitHub Actions
+
+Automate deployments to your server using the Docker Compose Deployment action.
+
+### Repository Secrets
+
+Set the following secrets in your GitHub repository:
+
+- `DEPLOY_HOST`: Remote server IP or hostname
+- `DEPLOY_PORT`: SSH port (default: `22`)
+- `DEPLOY_USER`: SSH user (default: `root`)
+- `SSH_PRIVATE_KEY`: SSH private key content
+
