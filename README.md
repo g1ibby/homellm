@@ -74,8 +74,6 @@ Automate deployments to your server using the Docker Compose Deployment action.
 
 Set the following secrets in your GitHub repository:
 
-- `DEPLOY_HOST`: Remote server IP or hostname
-- `DEPLOY_PORT`: SSH port (default: `22`)
-- `DEPLOY_USER`: SSH user (default: `root`)
+- `DEPLOY_TARGET`: Remote ssh string usre@ip:port
 - `SSH_PRIVATE_KEY`: SSH private key content
 
