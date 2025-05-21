@@ -7,17 +7,23 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: changeme_strong_password
+      LITELLM_HOSTNAME: litellm.yourdomain.com
+      LITELLM_MASTER_KEY: sk-changeme_litellm_master_key
+      LITELLM_SALT_KEY: sk-changeme_litellm_salt_key
+      LITELLM_UI_USERNAME: admin
+      LITELLM_UI_PASSWORD: changeme_litellm_ui_password
+      OPENWEBUI_HOSTNAME: chat.yourdomain.com
     steps:
       - uses: actions/checkout@v3
       - name: Docker Compose Deployment
         uses: g1ibby/dcd/dcd-deploy@main
         with:
-          command: up
           compose_files: docker-compose.yaml
-          env_files: .env
           host: ${{ secrets.DEPLOY_HOST }}
           port: ${{ secrets.DEPLOY_PORT }}
           user: ${{ secrets.DEPLOY_USER }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           remote_dir: /opt/homellm
-          no_health_check: 'false'
