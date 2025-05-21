@@ -23,7 +23,6 @@ jobs:
         with:
           compose_files: docker-compose.yaml
           host: ${{ secrets.DEPLOY_HOST }}
-          port: ${{ secrets.DEPLOY_PORT }}
           user: ${{ secrets.DEPLOY_USER }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           remote_dir: /opt/homellm
