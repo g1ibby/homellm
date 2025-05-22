@@ -33,6 +33,31 @@ services:
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
       - ./initdb:/docker-entrypoint-initdb.d
+      
+  pg-backup:
+    image: kartoza/pg-backup:17-3.5
+    container_name: homellm-pg-backup
+    restart: always
+    networks:
+      - traefik-net
+    depends_on:
+      - postgres
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER?Variable POSTGRES_USER is not set}
+      - POSTGRES_PASS=${POSTGRES_PASSWORD?Variable POSTGRES_PASSWORD is not set}
+      - DBLIST=litellm,openwebui
+      - CRON_SCHEDULE=0 0 * * *
+      - REMOVE_BEFORE=7
+      - STORAGE_BACKEND=S3
+      - BUCKET=${S3_BUCKET}
+      - ACCESS_KEY_ID=${S3_ACCESS_KEY}
+      - SECRET_ACCESS_KEY=${S3_SECRET_KEY}
+      - DEFAULT_REGION=${S3_REGION}
+      - ENDPOINT=${S3_ENDPOINT}
+    profiles:
+      - backup
 
   litellm:
     image: ghcr.io/berriai/litellm-database:main-latest

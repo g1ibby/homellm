@@ -55,7 +55,27 @@ docker-compose up -d
 
 Docker Compose will read the configuration, pull images, and start the containers. If the host directories specified in the `volumes` sections of `docker-compose.yml` (like `./postgres-data`, `./open-webui`) don't exist, Docker will typically create them automatically.
 
-**5. Access Your Services**
+**5. Database Backup (Optional)**
+
+The stack includes an optional PostgreSQL backup service that can automatically back up your databases to an S3 bucket.
+
+To enable database backups:
+
+1. Configure the S3 parameters in your `.env` file:
+   - Set the S3 bucket parameters (`S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_REGION`)
+   - Optionally set `S3_ENDPOINT` for non-AWS S3-compatible storage
+   - Uncomment or add the line `COMPOSE_PROFILES=backup`
+
+2. Start all services (including backup):
+```bash
+docker-compose up -d
+```
+
+With `COMPOSE_PROFILES=backup` set in your `.env` file, Docker Compose will automatically include the backup service when starting the stack.
+
+The backup service will run daily at midnight and keep backups for 7 days. It will back up both the `litellm` and `openwebui` databases.
+
+**6. Access Your Services**
 
 *   Allow a minute or two for services to fully initialize and for Traefik to obtain SSL certificates if needed.
 *   Open your browser and navigate to the hostnames you configured in your `.env` file:
