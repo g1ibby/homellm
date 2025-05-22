@@ -12,12 +12,12 @@ jobs:
     env:
       POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      LITELLM_HOSTNAME: ${{ vars.LITELLM_HOSTNAME }}
+      LITELLM_HOSTNAME: ${{ secrets.LITELLM_HOSTNAME }}
       LITELLM_MASTER_KEY: ${{ secrets.LITELLM_MASTER_KEY }}
       LITELLM_SALT_KEY: ${{ secrets.LITELLM_SALT_KEY }}
       LITELLM_UI_USERNAME: ${{ secrets.LITELLM_UI_USERNAME }}
       LITELLM_UI_PASSWORD: ${{ secrets.LITELLM_UI_PASSWORD }}
-      OPENWEBUI_HOSTNAME: ${{ vars.OPENWEBUI_HOSTNAME }}
+      OPENWEBUI_HOSTNAME: ${{ secrets.OPENWEBUI_HOSTNAME }}
     steps:
       - uses: actions/checkout@v3
       - name: Docker Compose Deployment
