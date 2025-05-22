@@ -63,7 +63,7 @@ services:
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
-    container_name: homell-webui
+    container_name: homellm-webui
     restart: always
     depends_on:
       - postgres
