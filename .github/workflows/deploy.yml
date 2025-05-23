@@ -18,6 +18,12 @@ jobs:
       LITELLM_UI_USERNAME: ${{ secrets.LITELLM_UI_USERNAME }}
       LITELLM_UI_PASSWORD: ${{ secrets.LITELLM_UI_PASSWORD }}
       OPENWEBUI_HOSTNAME: ${{ secrets.OPENWEBUI_HOSTNAME }}
+      COMPOSE_PROFILES: ${{ vars.COMPOSE_PROFILES }}
+      S3_BUCKET: ${{ secrets.S3_BUCKET }}
+      S3_ID: ${{ secrets.S3_ID }}
+      S3_SECRET: ${{ secrets.S3_SECRET }}
+      S3_REGION: ${{ secrets.S3_REGION }}
+      S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
     steps:
       - uses: actions/checkout@v3
       - name: Docker Compose Deployment
