@@ -51,10 +51,10 @@ services:
       - CRON_SCHEDULE=0 0 * * *
       - REMOVE_BEFORE=7
       - STORAGE_BACKEND=S3
-      - BUCKET=${S3_BUCKET}
-      - ACCESS_KEY_ID=${S3_ACCESS_KEY}
-      - SECRET_ACCESS_KEY=${S3_SECRET_KEY}
-      - DEFAULT_REGION=${S3_REGION}
+      - BUCKET=${S3_BUCKET?Variable S3_BUCKET is not set}
+      - ACCESS_KEY_ID=${S3_ID?Variable S3_ID is not set}
+      - SECRET_ACCESS_KEY=${S3_SECRET?Variable S3_SECRET is not set}
+      - DEFAULT_REGION=${S3_REGION?Variable S3_REGION is not set}
       - ENDPOINT=${S3_ENDPOINT}
     profiles:
       - backup
