@@ -100,6 +100,7 @@ services:
       RAG_EMBEDDING_ENGINE: "ollama"
       AUDIO_STT_ENGINE: "openai"
       DATABASE_URL: postgresql://${POSTGRES_USER?Variable POSTGRES_USER is not set}:${POSTGRES_PASSWORD?Variable POSTGRES_PASSWORD is not set}@postgres:5432/openwebui
+      WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY?Variable WEBUI_SECRET_KEY is not set}
     labels:
       - "traefik.enable=true"
       # Router configuration using variable from .env - Make mandatory
