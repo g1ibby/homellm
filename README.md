@@ -1,99 +1,152 @@
-# HomeLLM: Your Personal LLM Gateway and chat UI
+# HomeLLM: Personal LLM Gateway and Chat UI
 
-This project provides a straightforward boilerplate to deploy a powerful combination of Open WebUI and LiteLLM using Docker Compose. It's designed for personal use on your own server or VPS, giving you a private and controlled environment for interacting with various language models, fronted by a secure Traefik reverse proxy.
+A complete, production-ready Docker Compose setup for deploying your own private LLM infrastructure. Get a ChatGPT-like interface that works with any LLM provider - OpenAI, Anthropic, Google, local models, and more. Pay per token across multiple providers while managing all your API keys and usage from one centralized dashboard.
 
-## What's Inside?
+**What you get:**
+- ChatGPT-style web interface for any LLM provider
+- Unified API endpoint for all your language models
+- Centralized token usage tracking and billing management
+- Self-hosted, private alternative to ChatGPT Plus
 
-This setup bundles essential tools for your personal LLM stack:
+## What's Included
 
-*   **[Open WebUI](https://github.com/open-webui/open-webui):** A feature-rich, self-hosted web interface (similar to ChatGPT) for interacting with your language models.
-*   **[LiteLLM](https://github.com/BerriAI/litellm):** A versatile proxy that standardizes API calls to over 100 LLM providers (OpenAI, Anthropic, local models via Ollama, etc.). This allows you to manage all your LLM API keys and model configurations in one place and use a single LiteLLM endpoint in various tools like [Aider](https://github.com/paul-gauthier/aider), [Cursor](https://cursor.sh/), or your own projects.
-*   **PostgreSQL:** A shared database backend for both Open WebUI and LiteLLM persistence.
-*   **Traefik:** A modern reverse proxy handling secure HTTPS connections (via Let's Encrypt) and routing traffic.
-*   **Docker Compose:** The entire stack is defined in `docker-compose.yml` for easy, one-command deployment.
+- **[Open WebUI](https://github.com/open-webui/open-webui)** - Feature-rich web interface for interacting with language models
+- **[LiteLLM](https://github.com/BerriAI/litellm)** - Unified API gateway for 100+ LLM providers (OpenAI, Anthropic, local models)
+- **PostgreSQL** - Shared database for persistence
+- **Traefik** - Reverse proxy with automatic HTTPS via Let's Encrypt
+- **Optional S3 Backup** - Automated database backups
 
-## Prerequisites
+## Server Requirements
 
-*   A Server/VPS (Linux recommended).
-*   Docker & Docker Compose installed.
-*   A Domain Name you manage. You'll need DNS records pointing to your server for the hostnames you configure.
+- **Memory**: Minimum 1GB RAM
+- **Storage**: 50GB disk space (for Docker images and data)
+- **OS**: Linux (Debian/Ubuntu recommended)
+- **Domain**: DNS records pointing to your server
 
-## Setup Instructions
+## Deployment Methods
 
-**1. Clone the Repository**
+You can deploy HomeLLM in two ways:
 
-Get the project files onto your server:
+### Method 1: Automated GitHub Actions Deployment (Recommended)
 
+Fork this repository and deploy automatically on every push to main.
+
+#### Setup Steps
+
+1. **Fork this repository** to your GitHub account
+
+2. **Configure Repository Secrets** in your forked repo:
+   Go to Settings → Secrets and Variables → Actions, then add all the secrets from the table below.
+
+3. **Configure Repository Variables**:
+   - Set `COMPOSE_PROFILES` to `backup` if you want automated backups (optional)
+
+4. **Push to main branch** - deployment happens automatically!
+
+The deployment uses [DCD (Deploy Docker Compose)](https://github.com/g1ibby/dcd) tool for fast, reliable deployments to your server.
+
+### Method 2: Manual Deployment
+
+Deploy directly on your server using Docker Compose.
+
+#### Setup Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/g1ibby/homellm.git
+   cd homellm
+   ```
+
+2. **Configure environment**
+   ```bash
+   cp .env.dist .env
+   # Edit .env with your values (see table below)
+   ```
+
+3. **Deploy**
+   ```bash
+   docker-compose up -d
+   ```
+
+## Environment Variables
+
+Both deployment methods require the same environment variables. For GitHub Actions, set these as **Repository Secrets**. For manual deployment, configure them in your `.env` file.
+
+### Required Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `POSTGRES_USER` | PostgreSQL username | `postgres` |
+| `POSTGRES_PASSWORD` | PostgreSQL password | `your_strong_password` |
+| `LITELLM_HOSTNAME` | LiteLLM domain | `litellm.yourdomain.com` |
+| `LITELLM_MASTER_KEY` | LiteLLM API key (must start with `sk-`) | `sk-your_master_key` |
+| `LITELLM_SALT_KEY` | LiteLLM encryption key (must start with `sk-`) | `sk-your_salt_key` |
+| `LITELLM_UI_USERNAME` | LiteLLM admin username | `admin` |
+| `LITELLM_UI_PASSWORD` | LiteLLM admin password | `your_admin_password` |
+| `OPENWEBUI_HOSTNAME` | Open WebUI domain | `chat.yourdomain.com` |
+| `WEBUI_SECRET_KEY` | Open WebUI secret key | `your_secret_key` |
+
+### GitHub Actions Only
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `DEPLOY_TARGET` | SSH connection string | `user@your-server.com:22` |
+| `SSH_PRIVATE_KEY` | SSH private key content | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
+
+### Optional (S3 Backups)
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `COMPOSE_PROFILES` | Enable backup service | `backup` |
+| `S3_BUCKET` | S3 bucket name | `your-backup-bucket` |
+| `S3_ID` | S3 access key ID | `AKIAIOSFODNN7EXAMPLE` |
+| `S3_SECRET` | S3 secret access key | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY` |
+| `S3_REGION` | S3 region | `us-east-1` |
+| `S3_ENDPOINT` | S3 endpoint (for non-AWS) | `https://s3.amazonaws.com` |
+
+## DNS Configuration
+
+Point these A records to your server's IP address:
+- `chat.yourdomain.com` (or your chosen OpenWebUI hostname)
+- `litellm.yourdomain.com` (or your chosen LiteLLM hostname)
+
+**Cloudflare users**: Set SSL mode to "Full" or "Full (Strict)" for optimal compatibility.
+
+## Access Your Services
+
+After deployment (allow 1-2 minutes for initialization):
+
+- **Chat Interface**: `https://chat.yourdomain.com`
+- **LiteLLM API**: `https://litellm.yourdomain.com`
+
+## Database Backups
+
+When `COMPOSE_PROFILES=backup` is set, the system automatically:
+- Backs up both databases daily at midnight
+- Retains backups for 7 days
+- Stores backups in your configured S3 bucket
+
+## Monitoring
+
+View logs for troubleshooting:
 ```bash
-git clone https://github.com/g1ibby/homellm.git
-cd homellm
+# All services
+docker-compose logs
+
+# Specific service
+docker-compose logs traefik
+docker-compose logs litellm
+docker-compose logs open-webui
 ```
 
-**2. Configure DNS (Cloudflare Recommended)**
+## Security Notes
 
-*   You need to point DNS A records for the hostnames you intend to use (e.g., `chat.yourdomain.com`, `litellm.yourdomain.com`) to your server's public IP address.
-*   We **recommend** using [Cloudflare](https://www.cloudflare.com/) for managing your DNS. Cloudflare can also handle SSL certificates (offering alternatives to Traefik's Let's Encrypt), potentially simplifying setup or providing additional security features. If using Cloudflare for SSL (set to "Full" or "Full (Strict)" mode), ensure Traefik is still configured correctly to serve certificates or handle the internal routing appropriately. For this guide, we assume Traefik handles the Let's Encrypt certificates directly.
+- All secrets should be randomly generated
+- LiteLLM keys must start with `sk-` prefix
+- Use strong passwords for all accounts
+- Keep your server and Docker images updated
+- Consider setting up fail2ban for SSH protection
 
-**3. Create and Configure `.env` File**
+---
 
-This is crucial for storing your secrets and deployment-specific settings.
-
-*   Copy the template file:
-```bash
-cp .env.dist .env
-```
-*   **Edit the `.env` file**.
-*   Carefully replace **ALL** placeholder values with your actual secrets and desired hostnames. Pay close attention to the comments in the `.env.dist` file for guidance, especially the required `sk-` prefix for `LITELLM_MASTER_KEY` and `LITELLM_SALT_KEY`.
-
-**4. Launch the Stack**
-
-Start all the services:
-
-```bash
-docker-compose up -d
-```
-
-Docker Compose will read the configuration, pull images, and start the containers. If the host directories specified in the `volumes` sections of `docker-compose.yml` (like `./postgres-data`, `./open-webui`) don't exist, Docker will typically create them automatically.
-
-**5. Database Backup (Optional)**
-
-The stack includes an optional PostgreSQL backup service that can automatically back up your databases to an S3 bucket.
-
-To enable database backups:
-
-1. Configure the S3 parameters in your `.env` file:
-   - Set the S3 bucket parameters (`S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_REGION`)
-   - Optionally set `S3_ENDPOINT` for non-AWS S3-compatible storage
-   - Uncomment or add the line `COMPOSE_PROFILES=backup`
-
-2. Start all services (including backup):
-```bash
-docker-compose up -d
-```
-
-With `COMPOSE_PROFILES=backup` set in your `.env` file, Docker Compose will automatically include the backup service when starting the stack.
-
-The backup service will run daily at midnight and keep backups for 7 days. It will back up both the `litellm` and `openwebui` databases.
-
-**6. Access Your Services**
-
-*   Allow a minute or two for services to fully initialize and for Traefik to obtain SSL certificates if needed.
-*   Open your browser and navigate to the hostnames you configured in your `.env` file:
-    *   `https://<Your-OpenWebUI-Hostname>` (e.g., `https://chat.yourdomain.com`)
-    *   `https://<Your-LiteLLM-Hostname>` (e.g., `https://litellm.yourdomain.com`)
-
-You should be greeted by the respective interfaces, served over HTTPS.
-
-Enjoy your self-hosted LLM gateway and UI!
-
-## CI/CD with GitHub Actions
-
-Automate deployments to your server using the Docker Compose Deployment action.
-
-### Repository Secrets
-
-Set the following secrets in your GitHub repository:
-
-- `DEPLOY_TARGET`: Remote ssh string usre@ip:port
-- `SSH_PRIVATE_KEY`: SSH private key content
-
+**Note**: This setup is designed for personal/small team use. For production environments with high traffic, consider additional security hardening and scaling strategies.
