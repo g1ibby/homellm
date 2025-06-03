@@ -1,6 +1,17 @@
+<div align="center">
+
 # HomeLLM: Personal LLM Gateway and Chat UI
 
+<div align="center">
+  <img src="images/litellm.webp" width="45%" alt="LiteLLM Architecture" style="margin: 10px;">
+  <img src="images/openwebui.gif" width="45%" alt="Open WebUI Interface" style="margin: 10px;">
+</div>
+
+---
+
 A complete, production-ready Docker Compose setup for deploying your own private LLM infrastructure. Get a ChatGPT-like interface that works with any LLM provider - OpenAI, Anthropic, Google, local models, and more. Pay per token across multiple providers while managing all your API keys and usage from one centralized dashboard.
+
+</div>
 
 **What you get:**
 - ChatGPT-style web interface for any LLM provider
